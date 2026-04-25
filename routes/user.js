@@ -1,6 +1,5 @@
 import express from "express"
-const app=express();
-const userRouter=app.router();
+const userRouter=express.Router();
 
 
 userRouter.post("/signup",(req,res)=>{

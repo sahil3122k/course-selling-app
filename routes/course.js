@@ -1,6 +1,5 @@
-import express from "express"
-const app=express();
-const courseRouter=app.router();
+import express from "express";
+const courseRouter=express.Router();
 
 
 courseRouter.get("/preview",(req,res)=>{

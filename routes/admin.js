@@ -3,6 +3,8 @@ import { adminmodel } from "../models/admin.model.js";
 import dotenv from "dotenv";
 import jwt from"jsonwebtoken";
 import bcrypt from "bcrypt";
+import { coursemodel } from "../models/course.model.js";
+import { adminMiddleware} from "../middleware/admin.middleware.js";
 dotenv.config();
 const adminRouter=express.Router();
 
@@ -48,20 +50,54 @@ adminRouter.post("/signin",async(req,res)=>{
     }
 })
 
-adminRouter.post("/course",(req,res)=>{
-  res.json({
-    message:"course posting endpoint"
+adminRouter.post("/course",adminMiddleware,async(req,res)=>{
+  const adminId=req.userId;
+  const{title,description,imageUrl,price,creator}=req.body;
+  const course=await coursemodel.create({
+    title:title,
+    description:description,
+    imageUrl:imageUrl,
+    price:price,
+    creatorId:adminId,
   })
+  res.json({
+    message:"course created",
+    courseId:course._id
+  })
+
 })
-adminRouter.put("/course",(req,res)=>{
+adminRouter.put("/course",adminMiddleware,async(req,res)=>{
+    const adminId=req.userId;
+  const{title,description,imageUrl,price,creator}=req.body;
+
+  const course=await coursemodel.updateOne(
+    {_id:courseId,
+      creatorId:adminId
+    },
+    {
+      title:title,
+      description:description,
+      imageUrl:imageUrl,
+      price:price
+    }
+  )
   res.json({
-    message:"course changing endpoint"
+    message:"course updated",
+    courseId:course._id
   })
+   
+  
 })
-adminRouter.get("/course/bulk",(req,res)=>{
+adminRouter.get("/course/bulk",adminMiddleware,async(req,res)=>{
+  const adminId=req.userId;
+  const courses=await coursemodel.find({
+    creatorId:adminId
+  });
   res.json({
-    message:"course geting endpoint"
+    courses
   })
+
+  
 })
 export{adminRouter}
 

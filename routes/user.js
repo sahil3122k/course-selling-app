@@ -3,6 +3,9 @@ import { usermodel } from "../models/User.model.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
+import { purchasemodel } from "../models/purchase.module.js";
+import { userMiddleware } from "../middleware/user.middleware.js";
+import { coursemodel } from "../models/course.model.js";
 
 dotenv.config();
 
@@ -54,8 +57,20 @@ userRouter.post("/signin", async (req, res) => {
 });
 
 // Purchases
-userRouter.get("/purchases", (req, res) => {
-  res.json({ message: "purchases endpoint" });
+userRouter.get("/purchases",userMiddleware,async(req, res) => {
+  const userId=req.userId;
+  const purchases=await purchasemodel.find({
+    userId
+  })
+  const courseData=await coursemodel.find({
+    _id:{$in: purchases.map(x=>x.courseId)}
+  })
+  res.json({
+    purchases,
+    courseData
+  })
+
+  
 });
 
 export { userRouter };
